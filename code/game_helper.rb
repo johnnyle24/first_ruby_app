@@ -67,8 +67,12 @@ end
 class Array
 
   # filter the words to only those with size = len
-  def with_word_length(len)
-    self.select{ |term| term.length == len }
+  def with_word_length(*len)
+    self.select{ |term| 
+      len.any? { |length|
+        term.length == length
+      }
+    }
   end
 
   # filter the words to only those that start with
@@ -106,6 +110,25 @@ class Array
   # There's another way to do this, btw. Look up how Ruby supports aliasing.  
   def word_count
     self.count
+  end
+  
+  # Counts if the number of that letter is less than the total
+  def char_count_less_than(*list_of_possible_letters, total)
+    self.select{ |term|
+      list_of_possible_letters.any?{ |letter|
+        term.scan(/#{letter}/).count < total
+      }
+    }
+  end
+  
+  # filter the words to only those that end with
+  # at least one of the passed-in letters
+  def does_not_end_with(*list_of_possible_letters)
+    self.select{ |term|
+      list_of_possible_letters.any?{ |letter|
+        letter != term[-1]
+      }
+    }
   end
 
 end
