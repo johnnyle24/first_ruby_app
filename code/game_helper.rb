@@ -22,7 +22,7 @@ class GameHelper
   # by virtue of its name, initialize.
   def initialize(fname = '../data/SINGLE.TXT')
     # read in the data
-    f = File.open(fname,'r')
+    f = File.open(fname, 'r')
     
     # File::readlines will return an array of lines
     @all_words = f.readlines
