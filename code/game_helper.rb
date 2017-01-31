@@ -1,14 +1,13 @@
 
 # This class is probably overkill, but I'm including it here
 # to illustrate how you'd define your own class.
-class GameHelper 
-
+class GameHelper
   # normally, instance variables (those that being with an @)
   # are not accessible outside the object.  Ruby provides helper
-  # macros to provide getters and setters.  Here, I'm using 
+  # macros to provide getters and setters.  Here, I'm using
   # attr_reader to create a getter function.  The format for these
   # kinds of macros is to follow the macro name with a symbol
-  # that matches the instance variable name without the @.  
+  # that matches the instance variable name without the @.
   attr_reader :all_words
 
   # note that I could also have called attr_writer here to
@@ -23,25 +22,23 @@ class GameHelper
   def initialize(fname = '../data/SINGLE.TXT')
     # read in the data
     f = File.open(fname, 'r')
-    
+
     # File::readlines will return an array of lines
     @all_words = f.readlines
-    # notice how I didn't have to declare the 
+    # notice how I didn't have to declare the
     # @all_words variable ahead of assigning it.
 
     # remove the line returns and such
-    @all_words.map!{ |term| term.strip }
+    @all_words.map!(&:strip)
     # see how I used map! instead of map...I wanted
     # the mapping to change the object I called it on.
 
     # remove any words with internal punctuation
-    @all_words.delete_if{ |term| 
+    @all_words.delete_if do |term|
       term.match(/\W/)
-    }
+    end
   end
-
 end
-
 
 # In class, we originally started defining member functions on the
 # GameHelper class to search the word lists for operations like
@@ -52,85 +49,83 @@ end
 # those operations will need to take as input the results of the prior
 # operation.  While we *could* do that with our GameHelper class,
 # it's far simplier to use modify the built-in Array class with our
-# own functionality.  
+# own functionality.
 #
 # This is why I used attr_reader :all_words in the GameHelper
-# class.  That allows me to get at the @all_words instance variable 
+# class.  That allows me to get at the @all_words instance variable
 # within GameHelper (which is an Array object) so I can call our
 # added operators on it directly...which gives me chaining.
 #
 # To be more specific, by defining these operations on the Array
 # class, I can now do this:
-# 
+#
 #  my_array.with_word_length(5).begins_with('e').does_not_contain('x')
 #
 class Array
-
   # filter the words to only those with size = len
   def with_word_length(*len)
-    self.select{ |term| 
-      len.any? { |length|
+    select do |term|
+      len.any? do |length|
         term.length == length
-      }
-    }
+      end
+    end
   end
 
   # filter the words to only those that start with
   # at least one of the passed-in letters
   def begins_with(*list_of_possible_letters)
-    self.select{ |term|
-      list_of_possible_letters.any?{ |letter|
+    select do |term|
+      list_of_possible_letters.any? do |letter|
         letter == term[0]
-      }
-    }
+      end
+    end
   end
 
   # filter the words to only those that contain
   # at least one of the passed-in letters
   def contains(*list_of_possible_letters)
-    self.select{ |term|
-      list_of_possible_letters.any?{ |letter|
+    select do |term|
+      list_of_possible_letters.any? do |letter|
         term.match(/#{letter}/)
-      }
-    }
+      end
+    end
   end
 
   # filter the words to only those that do not
   # contain any of the passed-in letters
   def does_not_contain(*list_of_possible_letters)
-    self.select{ |term|
-      list_of_possible_letters.none?{ |letter|
+    select do |term|
+      list_of_possible_letters.none? do |letter|
         term.match(/#{letter}/)
-      }
-    }
+      end
+    end
   end
 
   # Syntactic sugar - just offering the existing Array count function
-  # under a name that makes more sense for our use case.  
-  # There's another way to do this, btw. Look up how Ruby supports aliasing.  
+  # under a name that makes more sense for our use case.
+  # There's another way to do this, btw. Look up how Ruby supports aliasing.
   def word_count
-    self.count
+    count
   end
-  
+
   # Counts if the number of that letter is less than the total
   def char_count_less_than(*list_of_possible_letters, total)
-    self.select{ |term|
-      list_of_possible_letters.any?{ |letter|
+    select do |term|
+      list_of_possible_letters.any? do |letter|
         term.scan(/#{letter}/).count < total
-      }
-    }
+      end
+    end
   end
-  
+
   # filter the words to only those that end with
   # at least one of the passed-in letters
   def does_not_end_with(*list_of_possible_letters)
-    self.select{ |term|
-      list_of_possible_letters.any?{ |letter|
+    select do |term|
+      list_of_possible_letters.any? do |letter|
         letter != term[-1]
-      }
-    }
+      end
+    end
   end
-
 end
 
 # Here's another example of adding functionality to an existing
@@ -139,11 +134,8 @@ end
 class String
   # how many times does the passed-in char occur
   # in the string?
-  def contains_count(char)
-  end
+  def contains_count(char) end
 end
-
-
 
 # find all 5-letter words that begin with 'e' but have no
 # more 'e' letters in them nor have an 'x' or 'y' in them
